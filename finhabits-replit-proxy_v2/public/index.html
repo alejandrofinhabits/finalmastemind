@@ -1,0 +1,121 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finhabits – Content Wizard</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo"></div>
+      <div class="brand">Finhabits</div>
+      <div class="badge">Content Wizard</div>
+    </div>
+
+    <div class="card">
+      <div class="row"><div class="badge">Webhook:</div><code id="hook"></code></div>
+      <div class="helper">El token no se expone al navegador. Se usa proxy del servidor.</div>
+    </div>
+
+    <form id="form" class="card">
+      <div class="grid">
+        <div>
+          <div class="label">Tema</div>
+          <input name="topic" placeholder="jubilación, seguros de auto..." required />
+        </div>
+        <div>
+          <div class="label">Idioma</div>
+          <select name="language"><option>ES</option><option>EN</option></select>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div>
+          <div class="label">Tema central</div>
+          <select name="central_theme">
+            <option>Retiro</option><option>Seguros</option><option>Inversiones</option>
+            <option>Crédito</option><option>Ahorro</option><option>Impuestos</option>
+          </select>
+        </div>
+        <div>
+          <div class="label">KW primaria</div>
+          <input name="primary_kw" placeholder="ej. 401k para principiantes" />
+        </div>
+        <div>
+          <div class="label">KW secundarias (coma)</div>
+          <input name="secondary_kws" placeholder="aporte 401k, match, límites 2025" />
+        </div>
+      </div>
+
+      <div class="label" style="margin-top:12px">Descripción / objetivos</div>
+      <textarea name="description" placeholder="Qué se debe lograr, puntos a cubrir/evitar..."></textarea>
+
+      <div class="grid">
+        <div>
+          <div class="label">Fuentes internas (slug, coma)</div>
+          <input name="internal_sources" placeholder="/aprende/401k, /aprende/ira" />
+        </div>
+        <div>
+          <div class="label">Fuentes externas (URLs, coma)</div>
+          <input name="external_sources" placeholder="https://www.irs.gov/..." />
+        </div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <div class="label">Sugerir título (opcional)</div>
+          <input name="suggested_title" />
+        </div>
+        <div>
+          <div class="label">Slug sugerido (opcional)</div>
+          <input name="suggested_slug" />
+        </div>
+      </div>
+
+      <label class="row" style="margin-top:12px">
+        <input type="checkbox" name="embed_video" />&nbsp;Insertar video al inicio (URL en descripción)
+      </label>
+
+      <div class="row" style="justify-content:space-between;margin-top:16px">
+        <button id="send" type="submit">Enviar a n8n</button>
+        <div class="helper">Configura <b>N8N_WEBHOOK_URL</b> y <b>N8N_TOKEN</b> en Secrets.</div>
+      </div>
+    </form>
+
+    <div id="out" class="card" style="display:none"></div>
+    <div class="footer">© Finhabits</div>
+  </div>
+
+  <script>
+  const form = document.getElementById('form');
+  const out = document.getElementById('out');
+  const hook = document.getElementById('hook');
+  fetch('/env').then(r=>r.json()).then(j=>{ hook.textContent = j.N8N_WEBHOOK_URL || '(no configurado)'; });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('send'); btn.disabled = true;
+    out.style.display = 'block'; out.innerHTML = '<div class="helper">Enviando…</div>';
+    const fd = new FormData(form); const payload = {};
+    for (const [k,v] of fd.entries()) {
+      if (k==='secondary_kws' || k==='internal_sources' || k==='external_sources'){
+        payload[k] = v.split(',').map(s=>s.trim()).filter(Boolean);
+      } else if (k==='embed_video'){
+        payload[k] = (fd.get('embed_video')==='on');
+      } else { payload[k]=v; }
+    }
+    try{
+      const r = await fetch('/submit', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      const j = await r.json();
+      const cls = j.ok ? 'success' : 'error';
+      out.innerHTML = '<pre class="'+cls+'">'+JSON.stringify(j, null, 2)+'</pre>';
+    }catch(err){
+      out.innerHTML = '<pre class="error">'+String(err)+'</pre>';
+    }finally{ btn.disabled = false; }
+  });
+  </script>
+</body>
+</html>
