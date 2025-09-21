@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -9,113 +8,386 @@
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <div class="logo"></div>
+    <header class="header">
+      <div class="logo" aria-hidden="true"></div>
       <div class="brand">Finhabits</div>
       <div class="badge">Content Wizard</div>
-    </div>
+    </header>
 
-    <div class="card">
-      <div class="row"><div class="badge">Webhook:</div><code id="hook"></code></div>
-      <div class="helper">El token no se expone al navegador. Se usa proxy del servidor.</div>
-    </div>
-
-    <form id="form" class="card">
-      <div class="grid">
+    <section class="card status-card" aria-live="polite">
+      <div class="status-grid">
         <div>
-          <div class="label">Tema</div>
-          <input name="topic" placeholder="jubilación, seguros de auto..." required />
+          <div class="label">Webhook n8n</div>
+          <code id="hook">(cargando...)</code>
+          <p class="helper">El token se mantiene seguro en el servidor.</p>
         </div>
         <div>
-          <div class="label">Idioma</div>
-          <select name="language"><option>ES</option><option>EN</option></select>
+          <div class="label">OpenAI</div>
+          <div id="openai-status" class="pill pill-warn">Sin configurar</div>
+          <p class="helper">Configura <strong>OPENAI_API_KEY</strong> en Secrets para activar el framework.</p>
         </div>
       </div>
+    </section>
 
-      <div class="grid-3">
-        <div>
-          <div class="label">Tema central</div>
-          <select name="central_theme">
-            <option>Retiro</option><option>Seguros</option><option>Inversiones</option>
-            <option>Crédito</option><option>Ahorro</option><option>Impuestos</option>
-          </select>
-        </div>
-        <div>
-          <div class="label">KW primaria</div>
-          <input name="primary_kw" placeholder="ej. 401k para principiantes" />
-        </div>
-        <div>
-          <div class="label">KW secundarias (coma)</div>
-          <input name="secondary_kws" placeholder="aporte 401k, match, límites 2025" />
-        </div>
-      </div>
-
-      <div class="label" style="margin-top:12px">Descripción / objetivos</div>
-      <textarea name="description" placeholder="Qué se debe lograr, puntos a cubrir/evitar..."></textarea>
+    <form id="article-form" class="card form-card" novalidate>
+      <h2>Framework Finhabits – Artículo SEO</h2>
+      <p class="helper">Completa el formulario para generar un brief + artículo siguiendo la estructura aprobada para Finhabits.</p>
 
       <div class="grid">
-        <div>
-          <div class="label">Fuentes internas (slug, coma)</div>
-          <input name="internal_sources" placeholder="/aprende/401k, /aprende/ira" />
-        </div>
-        <div>
-          <div class="label">Fuentes externas (URLs, coma)</div>
-          <input name="external_sources" placeholder="https://www.irs.gov/..." />
-        </div>
+        <label class="field">
+          <span class="label">H1 / Tema principal</span>
+          <input name="topic" required value="Car insurance for vehicle registration: state-by-state requirements" />
+        </label>
+        <label class="field">
+          <span class="label">SEO Title</span>
+          <input name="seo_title" required value="Car insurance for vehicle registration: state-by-state requirements" />
+        </label>
       </div>
 
       <div class="grid">
-        <div>
-          <div class="label">Sugerir título (opcional)</div>
-          <input name="suggested_title" />
-        </div>
-        <div>
-          <div class="label">Slug sugerido (opcional)</div>
-          <input name="suggested_slug" />
-        </div>
+        <label class="field">
+          <span class="label">Meta description</span>
+          <input name="meta_description" required value="Learn which states require proof of insurance before registration." />
+        </label>
+        <label class="field">
+          <span class="label">URL objetivo</span>
+          <input name="target_url" required value="https://finhabits.com/insurance/auto/do-you-need-insurance-to-register-a-car/" />
+        </label>
       </div>
 
-      <label class="row" style="margin-top:12px">
-        <input type="checkbox" name="embed_video" />&nbsp;Insertar video al inicio (URL en descripción)
+      <div class="grid">
+        <label class="field">
+          <span class="label">Primary keyword</span>
+          <input name="primary_kw" required value="do you need insurance to register a car" />
+        </label>
+        <label class="field">
+          <span class="label">Secondary keywords (separadas por coma)</span>
+          <input name="secondary_kws" value="is car insurance required, do you have to have insurance to register a car" />
+        </label>
+      </div>
+
+      <div class="grid">
+        <label class="field">
+          <span class="label">Intent</span>
+          <input name="intent" value="Informational (education-first)." />
+        </label>
+        <label class="field">
+          <span class="label">Idioma (copia principal)</span>
+          <input name="language" value="US English" />
+        </label>
+      </div>
+
+      <div class="grid">
+        <label class="field">
+          <span class="label">Word count mínimo</span>
+          <input type="number" name="word_count_min" value="1400" />
+        </label>
+        <label class="field">
+          <span class="label">Word count máximo</span>
+          <input type="number" name="word_count_max" value="1900" />
+        </label>
+      </div>
+
+      <div class="grid">
+        <label class="field">
+          <span class="label">Autor</span>
+          <input name="author_name" value="Finhabits Team" />
+        </label>
+        <label class="field">
+          <span class="label">Credenciales del autor</span>
+          <input name="author_credentials" value="Senior SEO Content Strategist" />
+        </label>
+      </div>
+
+      <div class="grid">
+        <label class="field">
+          <span class="label">Última actualización</span>
+          <input name="last_updated" value="September 18, 2025" />
+        </label>
+        <label class="field">
+          <span class="label">Lead paragraph seed (opcional)</span>
+          <textarea name="lead_paragraph_seed" rows="3" placeholder="Si deseas fijar el primer párrafo de 40–55 palabras, escríbelo aquí."></textarea>
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="label">Outline (1 sección por línea)</span>
+        <textarea name="outline_sections" rows="8">Intro with outcome-first promise + DefinitionSnippet
+What it is (precise definition with the primary keyword verbatim)
+Why it matters (benefits, risks, trade-offs)
+States that require proof of insurance
+Documents & DMV steps
+Common mistakes and how to avoid delays
+FAQs resolving People-Also-Ask queries
+Glossary (definitions of 6–10 terms)
+CTA + support options</textarea>
       </label>
 
-      <div class="row" style="justify-content:space-between;margin-top:16px">
-        <button id="send" type="submit">Enviar a n8n</button>
-        <div class="helper">Configura <b>N8N_WEBHOOK_URL</b> y <b>N8N_TOKEN</b> en Secrets.</div>
+      <label class="field">
+        <span class="label">SERP strategy (1 directiva por línea)</span>
+        <textarea name="serp_strategy" rows="6">DefinitionSnippet: a 40–55-word lead paragraph that defines the topic using “do you need insurance to register a car” verbatim once.
+PAA: add 5–7 FAQs with concise, direct answers (40–70 words each). Target questions users ask when comparing, buying or validating.
+Comparison blocks: use tables where relevant (e.g., inclusions vs exclusions, liability vs full coverage, state differences).
+Visuals: propose 2–3 simple charts/tables and 1 calculator or checklist if the topic fits (don’t invent data).</textarea>
+      </label>
+
+      <label class="field">
+        <span class="label">On-page requirements</span>
+        <textarea name="on_page_requirements" rows="5">Use the exact H1, Title, and Meta provided.
+Mention do you need insurance to register a car in the first 100 words and once in an H2/H3; keep density natural.
+Weave the secondary keywords where they fit contextually.
+Add an actionable CTA at the end (e.g., compare options, talk to a bilingual planner).
+Accessibility: descriptive alt text for all images; clear link text (no “click here”).</textarea>
+      </label>
+
+      <label class="field">
+        <span class="label">Trust & compliance (E-E-A-T)</span>
+        <textarea name="trust_signals" rows="4">Author line with relevant credentials; last-updated date.
+Cite neutral authorities (e.g., NAIC, state DMV pages) where needed; avoid brand bias.
+Add a clear disclaimer: informational, not legal/financial advice.
+Inclusive, plain language; explain jargon in the Glossary.</textarea>
+      </label>
+
+      <label class="field">
+        <span class="label">UX modules</span>
+        <textarea name="ux_modules" rows="6">DefinitionSnippet (40–55 words) with the primary keyword verbatim in the first sentence
+Scannable TL;DR box (bulleted list of 4–6 items)
+Legal obligations & penalties matrix (high level)
+Proof of financial responsibility explainer (SR-22 overview)
+State-by-state requirement summary (grouped)
+DMV appointment & documents checklist</textarea>
+      </label>
+
+      <label class="field">
+        <span class="label">Internal linking (anchors sugeridos)</span>
+        <textarea name="internal_linking" rows="4">Link to the calculator page, the general car insurance hub, and related topics (full coverage, cost, registration, switching). Use descriptive anchors (e.g., “compare full coverage vs liability”).</textarea>
+      </label>
+
+      <label class="field">
+        <span class="label">Style & tone</span>
+        <textarea name="style_notes" rows="4">Clear, direct, and helpful. No hype, no fluff. Use examples with realistic ranges; never fabricate sources.
+Avoid repetitive phrasing and AI-ish templates. Vary sentence openings and keep rhythm human.</textarea>
+      </label>
+
+      <label class="field">
+        <span class="label">Notas adicionales (guardrails específicos)</span>
+        <textarea name="additional_notes" rows="4" placeholder="Instrucciones extra, fuentes obligatorias, etc."></textarea>
+      </label>
+
+      <div class="form-actions">
+        <button id="generate" type="submit">Generar artículo</button>
+        <p class="helper">La respuesta incluye el artículo completo y el prompt usado.</p>
       </div>
     </form>
 
-    <div id="out" class="card" style="display:none"></div>
-    <div class="footer">© Finhabits</div>
+    <section id="article-output" class="card output-card" style="display:none">
+      <div class="output-head">
+        <h3>Artículo generado</h3>
+        <div class="row">
+          <button type="button" class="secondary" id="copy-article">Copiar artículo</button>
+          <button type="button" class="secondary" id="copy-prompt">Copiar prompt</button>
+        </div>
+      </div>
+      <div id="article-error" class="helper" role="alert" style="display:none"></div>
+      <pre id="article-text"></pre>
+      <details class="prompt-panel">
+        <summary>Ver prompt completo</summary>
+        <pre id="prompt-text"></pre>
+      </details>
+    </section>
+
+    <details class="card legacy-card">
+      <summary>Enviar intake a n8n (flujo original)</summary>
+      <p class="helper">Mantuvimos el formulario previo por si necesitas disparar el flujo en n8n.</p>
+      <form id="intake-form">
+        <div class="grid">
+          <label class="field">
+            <span class="label">Tema</span>
+            <input name="topic" placeholder="jubilación, seguros de auto..." required />
+          </label>
+          <label class="field">
+            <span class="label">Idioma</span>
+            <select name="language"><option>ES</option><option>EN</option></select>
+          </label>
+        </div>
+
+        <div class="grid-3">
+          <label class="field">
+            <span class="label">Tema central</span>
+            <select name="central_theme">
+              <option>Retiro</option><option>Seguros</option><option>Inversiones</option>
+              <option>Crédito</option><option>Ahorro</option><option>Impuestos</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="label">KW primaria</span>
+            <input name="primary_kw" placeholder="ej. 401k para principiantes" />
+          </label>
+          <label class="field">
+            <span class="label">KW secundarias (coma)</span>
+            <input name="secondary_kws" placeholder="aporte 401k, match, límites 2025" />
+          </label>
+        </div>
+
+        <label class="field">
+          <span class="label">Descripción / objetivos</span>
+          <textarea name="description" placeholder="Qué se debe lograr, puntos a cubrir/evitar..."></textarea>
+        </label>
+
+        <div class="grid">
+          <label class="field">
+            <span class="label">Fuentes internas (slug, coma)</span>
+            <input name="internal_sources" placeholder="/aprende/401k, /aprende/ira" />
+          </label>
+          <label class="field">
+            <span class="label">Fuentes externas (URLs, coma)</span>
+            <input name="external_sources" placeholder="https://www.irs.gov/..." />
+          </label>
+        </div>
+
+        <div class="grid">
+          <label class="field">
+            <span class="label">Sugerir título (opcional)</span>
+            <input name="suggested_title" />
+          </label>
+          <label class="field">
+            <span class="label">Slug sugerido (opcional)</span>
+            <input name="suggested_slug" />
+          </label>
+        </div>
+
+        <label class="row" style="margin-top:12px">
+          <input type="checkbox" name="embed_video" />
+          <span>Insertar video al inicio (URL en descripción)</span>
+        </label>
+
+        <div class="form-actions">
+          <button id="send" type="submit">Enviar a n8n</button>
+          <p class="helper">Configura <strong>N8N_WEBHOOK_URL</strong> y <strong>N8N_TOKEN</strong> en Secrets.</p>
+        </div>
+      </form>
+      <div id="intake-output" class="card" style="display:none"></div>
+    </details>
+
+    <footer class="footer">© Finhabits</footer>
   </div>
 
   <script>
-  const form = document.getElementById('form');
-  const out = document.getElementById('out');
+  const intakeForm = document.getElementById('intake-form');
+  const intakeOut = document.getElementById('intake-output');
   const hook = document.getElementById('hook');
-  fetch('/env').then(r=>r.json()).then(j=>{ hook.textContent = j.N8N_WEBHOOK_URL || '(no configurado)'; });
+  const openAiStatus = document.getElementById('openai-status');
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('send'); btn.disabled = true;
-    out.style.display = 'block'; out.innerHTML = '<div class="helper">Enviando…</div>';
-    const fd = new FormData(form); const payload = {};
-    for (const [k,v] of fd.entries()) {
-      if (k==='secondary_kws' || k==='internal_sources' || k==='external_sources'){
-        payload[k] = v.split(',').map(s=>s.trim()).filter(Boolean);
-      } else if (k==='embed_video'){
-        payload[k] = (fd.get('embed_video')==='on');
-      } else { payload[k]=v; }
+  fetch('/env').then(r => r.json()).then(j => {
+    hook.textContent = j.N8N_WEBHOOK_URL || '(no configurado)';
+    if (j.hasOpenAI) {
+      openAiStatus.textContent = 'Listo';
+      openAiStatus.classList.remove('pill-warn');
+      openAiStatus.classList.add('pill-ok');
     }
-    try{
-      const r = await fetch('/submit', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-      const j = await r.json();
-      const cls = j.ok ? 'success' : 'error';
-      out.innerHTML = '<pre class="'+cls+'">'+JSON.stringify(j, null, 2)+'</pre>';
-    }catch(err){
-      out.innerHTML = '<pre class="error">'+String(err)+'</pre>';
-    }finally{ btn.disabled = false; }
   });
+
+  if (intakeForm) {
+    intakeForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('send');
+      btn.disabled = true;
+      intakeOut.style.display = 'block';
+      intakeOut.innerHTML = '<div class="helper">Enviando…</div>';
+      const fd = new FormData(intakeForm);
+      const payload = {};
+      for (const [k, v] of fd.entries()) {
+        if (k === 'secondary_kws' || k === 'internal_sources' || k === 'external_sources') {
+          payload[k] = v.split(',').map(s => s.trim()).filter(Boolean);
+        } else if (k === 'embed_video') {
+          payload[k] = fd.get('embed_video') === 'on';
+        } else {
+          payload[k] = v;
+        }
+      }
+      try {
+        const r = await fetch('/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const j = await r.json();
+        const cls = j.ok ? 'success' : 'error';
+        intakeOut.innerHTML = '<pre class="' + cls + '">' + JSON.stringify(j, null, 2) + '</pre>';
+      } catch (err) {
+        intakeOut.innerHTML = '<pre class="error">' + String(err) + '</pre>';
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+
+  const articleForm = document.getElementById('article-form');
+  const articleOut = document.getElementById('article-output');
+  const articleText = document.getElementById('article-text');
+  const promptText = document.getElementById('prompt-text');
+  const articleError = document.getElementById('article-error');
+  const copyArticleBtn = document.getElementById('copy-article');
+  const copyPromptBtn = document.getElementById('copy-prompt');
+
+  const listFields = ['outline_sections', 'serp_strategy', 'trust_signals', 'on_page_requirements', 'ux_modules', 'internal_linking', 'style_notes'];
+
+  if (articleForm) {
+    articleForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('generate');
+      btn.disabled = true;
+      articleOut.style.display = 'block';
+      articleError.style.display = 'none';
+      articleText.textContent = 'Generando artículo…';
+      promptText.textContent = '';
+
+      const fd = new FormData(articleForm);
+      const payload = {};
+      for (const [k, v] of fd.entries()) {
+        if (k === 'secondary_kws') {
+          payload[k] = v.split(',').map(s => s.trim()).filter(Boolean);
+        } else if (listFields.includes(k)) {
+          payload[k] = v;
+        } else if (k === 'word_count_min' || k === 'word_count_max') {
+          const num = parseInt(v, 10);
+          if (!Number.isNaN(num)) payload[k] = num;
+        } else {
+          payload[k] = v;
+        }
+      }
+
+      try {
+        const r = await fetch('/generate-article', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const j = await r.json();
+        if (!j.ok) {
+          throw new Error(j.error || 'Error generando el artículo');
+        }
+        articleText.textContent = j.article || '';
+        promptText.textContent = j.prompt || '';
+      } catch (err) {
+        articleError.textContent = String(err);
+        articleError.style.display = 'block';
+        articleText.textContent = '';
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+
+  async function copyToClipboard(getText) {
+    try {
+      const text = getText();
+      if (!text) return;
+      await navigator.clipboard.writeText(text);
+      alert('Copiado al portapapeles.');
+    } catch (err) {
+      alert('No se pudo copiar: ' + err);
+    }
+  }
+
+  if (copyArticleBtn) {
+    copyArticleBtn.addEventListener('click', () => copyToClipboard(() => articleText.textContent));
+  }
+  if (copyPromptBtn) {
+    copyPromptBtn.addEventListener('click', () => copyToClipboard(() => promptText.textContent));
+  }
   </script>
 </body>
 </html>
